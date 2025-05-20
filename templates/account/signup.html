@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Template">
+    <meta name="keywords" content="admin dashboard, admin, flat, flat ui, ui kit, app, web app, responsive">
+    <link rel="shortcut icon" href="/static/account/img/ico/favicon.png">
+    <title>Login</title>
+
+
+      <link rel="stylesheet" href="/static/css/backend-plugin.min.css">
+      <link rel="stylesheet" href="/static/css/backend.css">  </head>
+    <![endif]-->
+
+
+</head>
+
+  <body >
+
+
+
+  <div class="wrapper">
+          <section class="login-content" style="background-image:url('/static/bg.jpg');background-size: cover;">
+                             <div class="container h-100">
+                                                 <div class="row align-items-center justify-content-center h-100">
+
+                                                                    <div class="col-md-5">
+                  <div class="card p-3">
+                     <div class="card-body">
+                        <div class="auth-logo">
+
+                        </div>
+                        <h3 class="mb-3 font-weight-bold text-center">欢迎注册</h3>
+                        <div class="mb-5">
+                            <p class="line-around text-secondary mb-0"><span class="line-around-1">输入您的用户名和密码</span></p>
+                        </div>
+
+
+
+          <form class="form-signin" action="{% url 'account_signup' %}" method="post">
+              {% csrf_token %}
+              <p>请输入您的注册信息</p>
+              <input type="text" class="form-control" placeholder="邮箱地址" name="email" autofocus>
+              <p style="color: red">{{ form.email.errors }}</p>
+              <input type="text" class="form-control" placeholder="用户名" name="username" autofocus>
+              <p style="color: red">{{ form.username.errors }}</p>
+              <input type="password" class="form-control" placeholder="密码" name="password1">
+              <p style="color: red">{{ form.password1.errors }}</p>
+              <input type="password" class="form-control" placeholder="重复密码" name="password2">
+              <p style="color: red">{{ form.password2.errors }}</p>
+              <label class="checkbox-custom check-success">
+                  <input type="checkbox" value="agree this condition" id="checkbox1"> <label for="checkbox1">我同意服务条款和隐私政策</label>
+              </label>
+
+
+              <button class="btn btn-lg btn-success btn-block" type="submit">提交</button>
+
+              <div class="registration m-t-20 m-b-20">
+                  已有账号
+                  <a class="" href="{% url 'account_login' %}">
+                      去登录
+                  </a>
+              </div>
+          </form>
+
+
+
+
+                     </div>
+                  </div>
+               </div>
+
+
+
+                                                 </div>
+
+
+
+
+
+                             </div>
+
+
+
+          </section>
+
+
+</div>
+
+
+
+      <!--jquery-1.10.2.min-->
+      <script src="/static/account/js/jquery-1.11.1.min.js"></script>
+      <!--Bootstrap Js-->
+      <script src="/static/account/js/bootstrap.min.js"></script>
+      <script src="/static/account/js/jrespond..min.js"></script>
+
+  </body>
+</html>

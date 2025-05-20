@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Template">
+    <meta name="keywords" content="admin dashboard, admin, flat, flat ui, ui kit, app, web app, responsive">
+    <link rel="shortcut icon" href="/static/account/img/ico/favicon.png">
+    <title>Login</title>
+
+
+      <link rel="stylesheet" href="/static/css/backend-plugin.min.css">
+      <link rel="stylesheet" href="/static/css/backend.css">  </head>
+    <![endif]-->
+
+
+</head>
+
+  <body >
+
+
+
+  <div class="wrapper">
+          <section class="login-content" style="background-image:url('/static/bg.jpg');background-size: cover;">
+                             <div class="container h-100">
+                                                 <div class="row align-items-center justify-content-center h-100">
+
+                                                                    <div class="col-md-5">
+                  <div class="card p-3">
+                     <div class="card-body">
+                        <div class="auth-logo">
+
+                        </div>
+                        <h3 class="mb-3 font-weight-bold text-center">欢迎登录</h3>
+                        <div class="mb-5">
+                            <p class="line-around text-secondary mb-0"><span class="line-around-1">输入您的用户名和密码</span></p>
+                        </div>
+
+
+                              <form class="form-signin" action="{% url 'account_login' %}" method="post">
+                                  {% csrf_token %}
+                                  <div class="login-wrap">
+                                      <input type="text" class="form-control" placeholder="User" name="login" autofocus>
+                                      <p style="color: red">{{ form.login.errors }}</p>
+                                      <input type="password" class="form-control" placeholder="Password" name="password">
+                                      <p style="color: red">{{ form.password.errors }}</p>
+                                      <button class="btn btn-lg btn-success btn-block" type="submit">登录</button>
+                                      <label class="checkbox-custom check-success">
+                                          <input type="checkbox" value="remember-me" id="checkbox1"> <label for="checkbox1">记住我</label>
+                                      </label>
+
+                                     <div class="registration">
+                                         没有账号?
+                                        <a class="" href="{% url 'account_signup' %}">
+                                             去注册
+                                         </a>
+                                      </div>
+
+                                  </div>
+
+
+                              </form>
+
+
+
+
+
+                     </div>
+                  </div>
+               </div>
+
+
+
+                                                 </div>
+
+
+
+
+
+                             </div>
+
+
+
+          </section>
+
+
+</div>
+
+
+
+      <!--jquery-1.10.2.min-->
+      <script src="/static/account/js/jquery-1.11.1.min.js"></script>
+      <!--Bootstrap Js-->
+      <script src="/static/account/js/bootstrap.min.js"></script>
+      <script src="/static/account/js/jrespond.min.js"></script>
+
+  </body>
+</html>

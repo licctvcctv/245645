@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block  title%}
+评论内容词云图
+{% endblock %}
+
+{% block sidebar%}
+    <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'home' %}">
+          <i class="bi bi-grid"></i>
+          <span>首页</span>
+        </a>
+      </li>
+      <li class="nav-heading">个人信息</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed"  href="{% url 'changeSelfInfo' %}">
+          <i class="bi bi-menu-button-wide"></i><span>修改信息</span></i>
+        </a>
+      </li><!-- End Components Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed"  href="{% url 'changePassword' %}">
+          <i class="bi bi-journal-text"></i><span>修改密码</span>
+        </a>
+      </li>
+      <li class="nav-heading">数据表格</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'tableData' %}">
+          <i class="bi bi-layout-text-window-reverse"></i><span>数据操作</span>
+        </a>
+      </li>
+      <li class="nav-heading">数据可视化</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed"  href="{% url 'cityChar' %}">
+          <i class="bi bi-bar-chart"></i><span>城市和景点等级分析</span></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'rateChar' %}">
+          <i class="bi bi-gem"></i><span>评分情况分析</span>
+        </a>
+      </li><!-- End Icons Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'priceChar' %}">
+          <i class="bi bi-person"></i>
+          <span>价格销量分析</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'commentsChar' %}">
+          <i class="bi bi-question-circle"></i>
+          <span>评论分析</span>
+        </a>
+      </li>
+      <li class="nav-heading">推荐功能</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'recommendation' %}">
+          <i class="bi bi-envelope"></i>
+          <span>推荐算法</span>
+        </a>
+      </li><!-- End Contact Page Nav -->
+      <li class="nav-heading">词云图</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'detailIntroCloud' %}">
+          <i class="bi bi-card-list"></i>
+          <span>详情简介词云图</span>
+        </a>
+
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'commentContentCloud' %}">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>评论内容词云图</span>
+        </a>
+      </li>
+    </ul>
+
+  </aside>
+
+{% endblock %}
+
+
+{% block content %}
+      <div class="pagetitle" style="display: flex;align-items: center">
+      <div style="margin-right: auto">
+
+        <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'home' %}">数据可视化</a></li>
+          <li class="breadcrumb-item active">评论内容词云图</li>
+        </ol>
+      </nav>
+      </div>
+
+    </div>
+
+
+      <section class="section dashboard">
+              <div class="row">
+                <div class="col-lg-12">
+
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">评论内容词云图</h5>
+                        
+                        <div id="main1" style="width:100%;height: 650px;text-align: center">
+                           
+                        </div>
+
+
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </section>
+
+
+{% endblock %}
+
+{% block echarts%}
+
+    <script src="/static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+    <script src="/static/js/echarts.js" charset='utf-8'></script>
+    <script src="/static/js/echarts-wordcloud.min.js" type="text/javascript" charset='utf-8'></script>
+
+    <script type="text/javascript">
+
+               function echartsCloud(data) {
+                        // 基于准备好的dom，初始化echarts实例
+                        var myChart = echarts.init(document.getElementById('main1'));
+
+                           var option = {
+                           // title: {
+                            //    left: 'center',
+                           //     text: '详情简介词云',
+                           // },
+                            tooltip: {},
+                            series: [{
+                                type: 'wordCloud',  //类型为字符云
+                                shape: 'circle',  //平滑 椭圆:ellipse 圆形:circle
+                                gridSize: 20,    //网格尺寸
+                                size: ['100%', '100%'],
+                                sizeRange: [10, 100],
+                                rotationRange: [0, 40], //旋转范围
+                                textStyle: {
+                                    normal: {
+                                        fontFamily: 'sans-serif',
+                                        color: function () {
+                                            return 'rgb('
+                                                + [Math.round(Math.random() * 160),
+                                                    Math.round(Math.random() * 160),
+                                                    Math.round(Math.random() * 160)
+                                                ].join(',') + ')';
+                                        }
+                                    },
+                                    emphasis: {
+                                        shadowBlur: 5,       //阴影距离
+                                        shadowColor: '#333'  //阴影颜色
+                                    }
+                                },
+                                data: data,
+                            }]
+                        }
+
+                  if (option && typeof option === "object") {
+                      console.log(data)
+                        myChart.setOption(option, true);
+                    }
+
+                        $(window).resize(function () {
+                            myChart.resize();
+                        });
+                    }
+        let data = {{ wordcloud_list|safe  }}
+
+        echartsCloud(data.data)
+
+
+    </script>
+
+
+{% endblock %}
