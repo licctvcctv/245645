@@ -1,0 +1,237 @@
+{% extends 'apps/base.html' %}
+{% block title %}SUV汽车数据分析系统{% endblock %}
+
+{% block content %}
+
+<section class="wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header"><i class="fa fa-dashboard"></i> SUV汽车大数据分析平台</h3>
+            <ol class="breadcrumb">
+                <li><i class="fa fa-home"></i><a href="/index">首页</a></li>
+                <li><i class="fa fa-dashboard"></i>数据概览</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- 数据概览卡片 -->
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <div class="info-box blue-bg">
+                <i class="fa fa-car"></i>
+                <div class="count">{{ results|length }}+</div>
+                <div class="title">车型总数</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <div class="info-box brown-bg">
+                <i class="fa fa-money-bill-alt"></i>
+                <div class="count">{{ price_ranges|length }}</div>
+                <div class="title">价格区间</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <div class="info-box green-bg">
+                <i class="fa fa-calendar"></i>
+                <div class="count">3</div>
+                <div class="title">年份跨度(2022-2024)</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <div class="info-box purple-bg">
+                <i class="fa fa-chart-pie"></i>
+                <div class="count">{{ sale_status.on_sale }}:{{ sale_status.off_sale }}</div>
+                <div class="title">在售:停售比例</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据分析入口 -->
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3><i class="fa fa-chart-bar"></i> 数据分析工具</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="well well-sm">
+                                <h4><i class="fa fa-chart-pie"></i> 基础可视化</h4>
+                                <p>查看SUV汽车数据的基础统计图表，包括价格分布、销量统计等</p>
+                                <a href="/keshihua" class="btn btn-primary">查看分析</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="well well-sm">
+                                <h4><i class="fa fa-chart-line"></i> 销量趋势分析</h4>
+                                <p>分析2022-2024年SUV汽车销量趋势，了解市场变化</p>
+                                <a href="/salekeshihua" class="btn btn-success">查看分析</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="well well-sm">
+                                <h4><i class="fa fa-sitemap"></i> 聚类分析</h4>
+                                <p>使用K-means算法对SUV汽车进行聚类分析，发现市场细分</p>
+                                <a href="/analysis" class="btn btn-danger">查看分析</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <div class="well well-sm">
+                                <h4><i class="fa fa-chart-line"></i> 高级可视化</h4>
+                                <p>多维度高级可视化展示，包括三维散点图、雷达图、平行坐标图等</p>
+                                <a href="/advanced_analysis" class="btn btn-info">查看分析</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据表格 -->
+    <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fa fa-table"></i> SUV汽车数据表</h3>
+                    <p>共收集了{{ results|length }}款SUV车型的详细数据</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example1" class="table table-bordered table-hover display">
+                            <thead>
+                                <tr>
+                                    <th>图片</th>
+                                    <th>年份</th>
+                                    <th>名字</th>
+                                    <th>状态</th>
+                                    <th>价格(万)</th>
+                                    <th>销量(辆)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resu in results %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ resu.car_img }}" alt="{{ resu.car_name }}" style="max-width: 100px;">
+                                    </td>
+                                    <td>{{ resu.car_year }}</td>
+                                    <td>{{ resu.car_name }}</td>
+                                    <td>
+                                        {% if resu.car_sale == '在售' %}
+                                        <span class="label label-success">{{ resu.car_sale }}</span>
+                                        {% else %}
+                                        <span class="label label-danger">{{ resu.car_sale }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ resu.car_price }}</td>
+                                    <td>{{ resu.car_num }} 辆</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据处理流程 -->
+    <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fa fa-cogs"></i> 数据处理流程</h3>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-badge"><i class="fa fa-spider"></i></div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h4 class="timeline-title">数据爬取</h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <p>使用Python爬虫从易车网爬取2022-2024年SUV汽车数据，包括车型名称、价格、销量等信息</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge"><i class="fa fa-broom"></i></div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h4 class="timeline-title">数据清洗</h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <p>处理缺失值、去除重复数据、异常值处理、数据类型转换、特征提取</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge"><i class="fa fa-balance-scale"></i></div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h4 class="timeline-title">数据标准化</h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <p>对价格使用Min-Max归一化到[0,1]区间，对销量使用Z-score标准化</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge"><i class="fa fa-chart-bar"></i></div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h4 class="timeline-title">数据可视化与分析</h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <p>使用K-means聚类算法进行分析，通过肘部法则和轮廓系数确定最佳聚类数量，生成交互式可视化图表</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+
+{% block script %}
+<!-- BEGIN Java Script for this page -->
+	<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+        <script>
+            $.fn.dataTable.defaults.oLanguage = {
+        "sProcessing": "处理中...",
+        "sLengthMenu": "显示 _MENU_ 项结果",
+        "sZeroRecords": "没有匹配结果",
+        "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+        "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+        "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+        "sInfoPostFix": "",
+        "sSearch": "搜索：",
+        "sUrl": "",
+        "sEmptyTable": "表中数据为空",
+        "sLoadingRecords": "载入中...",
+        "sInfoThousands": ",",
+        "oPaginate": {
+            "sFirst": "首页",
+            "sPrevious": "上页",
+            "sNext": "下页",
+            "sLast": "末页"
+        },
+        "oAria": {
+            "sSortAscending": ": 以升序排列此列",
+            "sSortDescending": ": 以降序排列此列"
+        }
+    }
+
+    </script>
+{% endblock %}

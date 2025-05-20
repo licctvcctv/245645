@@ -1,0 +1,371 @@
+{% extends 'apps/base.html' %}
+{% load custom_filters %}
+{% block title %}SUV汽车聚类分析{% endblock %}
+
+{% block content %}
+
+<div class="content">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header"><i class="fa fa-chart-bar"></i> SUV汽车数据聚类分析</h3>
+            <ol class="breadcrumb">
+                <li><i class="fa fa-home"></i><a href="/index">首页</a></li>
+                <li><i class="fa fa-chart-bar"></i>聚类分析</li>
+            </ol>
+            <a href="/advanced_analysis" class="btn btn-primary float-right">
+                <i class="fa fa-chart-line"></i> 高级可视化分析
+            </a>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- 数据处理流程说明 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-info-circle"></i> 数据处理流程</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="process-step">
+                                    <h5>1. 数据采集</h5>
+                                    <p>从易车网爬取2022-2024年SUV汽车数据，包含100+个车型的价格、销量等信息</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="process-step">
+                                    <h5>2. 数据清洗</h5>
+                                    <p>处理缺失值、去除重复数据、异常值处理、数据类型转换、特征提取</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="process-step">
+                                    <h5>3. 数据标准化</h5>
+                                    <p>对价格使用Min-Max归一化，对销量使用Z-score标准化</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="process-step">
+                                    <h5>4. 聚类分析</h5>
+                                    <p>使用K-means算法将SUV车型分为高、中、低三个档次</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聚类结果表格 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-table"></i> 聚类结果统计</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="example1" class="table table-bordered table-hover display">
+                                <thead>
+                                    <tr>
+                                        <th>聚类</th>
+                                        <th>档次</th>
+                                        <th>平均价格(万)</th>
+                                        <th>中位数(万)</th>
+                                        <th>最低价格(万)</th>
+                                        <th>最高价格(万)</th>
+                                        <th>车型数量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for resu in clusters_data %}
+                                    <tr>
+                                        <td>{{ resu.num }}</td>
+                                        <td>{{ resu.name }}</td>
+                                        <td>{{ resu.mean }}</td>
+                                        <td>{{ resu.median }}</td>
+                                        <td>{{ resu.min }}</td>
+                                        <td>{{ resu.max }}</td>
+                                        <td>{{ resu.count }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聚类差异分析 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-chart-line"></i> 聚类差异分析</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> 聚类分析基于价格和销量两个维度，并给予价格更高的权重。高档SUV通常价格更高，中档和低档SUV则根据价格和销量的综合表现进行区分。
+                        </p>
+                        <ul class="list-group">
+                            {% for diff in clusters_diff %}
+                            <li class="list-group-item">{{ diff }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聚类方法评估 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-chart-line"></i> 聚类方法评估</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>肘部法则 (Elbow Method)</h5>
+                                <img src="{{ elbow_image }}" alt="肘部法则图" style="width: 100%;">
+                                <p class="mt-2">肘部法则通过计算不同K值下的SSE(误差平方和)，找到SSE下降趋势变缓的"肘部"点，确定最佳聚类数量。</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>轮廓系数 (Silhouette Score)</h5>
+                                <img src="{{ silhouette_image }}" alt="轮廓系数图" style="width: 100%;">
+                                <p class="mt-2">轮廓系数衡量聚类的紧密度和分离度，值越接近1表示聚类效果越好。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 价格分布直方图 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-chart-bar"></i> 各档次SUV价格分布</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for i in histogram_images %}
+                            <div class="col-md-4">
+                                <img src="{{ i }}" alt="价格分布图" style="width: 100%;">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 价格趋势图 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-chart-line"></i> 2022-2024年各档次SUV价格趋势</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="priceTrendChart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 销量趋势图 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-chart-line"></i> 2022-2024年各档次SUV销量趋势</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="salesTrendChart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 各聚类车型列表 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-list"></i> 各档次SUV代表车型</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="clusterTabs" role="tablist">
+                            {% for i in cluster_names %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if forloop.first %}active{% endif %}" id="cluster{{ i }}-tab" data-toggle="tab" href="#cluster{{ i }}" role="tab">{{ cluster_names|get_item:i }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="tab-content" id="clusterTabContent">
+                            {% for i in cluster_cars %}
+                            <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="cluster{{ i }}" role="tabpanel">
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>车型名称</th>
+                                                <th>年份</th>
+                                                <th>价格(万)</th>
+                                                <th>销量(辆)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for car in cluster_cars|get_item:i %}
+                                            <tr>
+                                                <td>{{ car.name }}</td>
+                                                <td>{{ car.year }}</td>
+                                                <td>{{ car.price }}</td>
+                                                <td>{{ car.sales }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="/static/echarts.min.js"></script>
+    <script type="text/javascript">
+        // 价格趋势图
+        var priceChart = echarts.init(document.getElementById('priceTrendChart'));
+        var priceOption = {
+            title: {
+                text: '各档次SUV平均价格年度趋势(2022-2024)'
+            },
+            tooltip: {
+                trigger: 'axis',
+                formatter: '{b}年<br/>{a}: {c}万元'
+            },
+            legend: {
+                data: [
+                    {% for i in cluster_names %}
+                    '{{ cluster_names|get_item:i }}',
+                    {% endfor %}
+                ]
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: {{ years|safe }}
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value} 万'
+                }
+            },
+            series: [
+                {% for i in cluster_prices %}
+                {
+                    name: '{{ cluster_names|get_item:i }}',
+                    type: 'line',
+                    data: {{ cluster_prices|get_item:i|safe }},
+                    markPoint: {
+                        data: [
+                            { type: 'max', name: '最高价' },
+                            { type: 'min', name: '最低价' }
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            { type: 'average', name: '平均价' }
+                        ]
+                    }
+                },
+                {% endfor %}
+            ]
+        };
+        priceChart.setOption(priceOption);
+
+        // 销量趋势图
+        var salesChart = echarts.init(document.getElementById('salesTrendChart'));
+        var salesOption = {
+            title: {
+                text: '各档次SUV平均销量年度趋势(2022-2024)'
+            },
+            tooltip: {
+                trigger: 'axis',
+                formatter: '{b}年<br/>{a}: {c}辆'
+            },
+            legend: {
+                data: [
+                    {% for i in cluster_names %}
+                    '{{ cluster_names|get_item:i }}',
+                    {% endfor %}
+                ]
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: {{ years|safe }}
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value} 辆'
+                }
+            },
+            series: [
+                {% for i in cluster_sales %}
+                {
+                    name: '{{ cluster_names|get_item:i }}',
+                    type: 'line',
+                    data: {{ cluster_sales|get_item:i|safe }},
+                    markPoint: {
+                        data: [
+                            { type: 'max', name: '最高销量' },
+                            { type: 'min', name: '最低销量' }
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            { type: 'average', name: '平均销量' }
+                        ]
+                    }
+                },
+                {% endfor %}
+            ]
+        };
+        salesChart.setOption(salesOption);
+
+        // 响应式调整
+        window.addEventListener('resize', function() {
+            priceChart.resize();
+            salesChart.resize();
+        });
+    </script>
+{% endblock %}

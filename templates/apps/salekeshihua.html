@@ -1,0 +1,395 @@
+{% extends 'apps/base.html' %}
+{% block title %}主页{% endblock %}
+
+{% block content %}
+
+<div class="content">
+
+			  <div class="row">
+				<div class="col-lg-12">
+					<h3 class="page-header"><i class="fa fa-table"></i> 可视化</h3>
+					<ol class="breadcrumb">
+						<li><i class="fa fa-home"></i><a href="/index">Home</a></li>
+						<li><i class="fa fa-table"></i>数据查看</li>
+					</ol>
+				</div>
+			</div>
+			<div class="container-fluid">
+				<!-- end row -->
+
+				<div class="row">
+
+
+					<div class="col-md-6 col-lg-12">
+						<div class="card" style="background-color: white;margin: 20px 20px 20px 20px">
+							<div id="app5" style="height: 250px"></div>
+						</div>
+					</div>
+
+
+
+					<div class="col-md-6 col-lg-12">
+						<div class="card" style="background-color: white;margin: 20px 20px 20px 20px">
+							<div id="app6" style="height: 250px"></div>
+						</div>
+					</div>
+
+                    <div class="col-md-6 col-lg-6">
+						<div class="card" style="background-color: white;margin: 20px 20px 20px 20px">
+							<div id="app10" style="height: 300px"></div>
+						</div>
+					</div>
+
+
+					<div class="col-md-6 col-lg-6">
+						<div class="card" style="background-color: white;margin: 20px 20px 20px 20px">
+							<div id="app9" style="height: 300px"></div>
+						</div>
+
+					</div>
+
+				</div>
+				<!-- end row -->
+
+            </div>
+			<!-- END container-fluid -->
+
+		</div>
+
+{% endblock %}
+
+
+{% block script %}
+    <script type="text/javascript" src="/static/echarts.min.js"></script>
+	<script type="text/javascript" src="/static/echarts-wordcloud.js"></script>
+
+<script>
+var dom = document.getElementById("app1");
+var myChart = echarts.init(dom);
+
+var option = {
+    title: {
+        text: '各品牌售价',
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },          
+    toolbox: {
+            show: true,
+            feature: {
+              dataView: { show: true, readOnly: false },
+              magicType: { show: true, type: ['line', 'bar'] },
+              restore: { show: true },
+              saveAsImage: { show: true }
+            }
+          },
+      calculable: true,
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: {{fz_name1 | safe}},
+            axisTick: {
+                alignWithLabel: true
+            }
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value'
+        }
+    ],
+      dataZoom: [
+            {
+              show: true,
+              start: 0,
+              end: 20
+            }
+          ],
+    series: [
+        {
+            name: '价格',
+            type: 'bar',
+            barWidth: '60%',
+            data: {{fz_count1 | safe}},
+           markPoint: {
+                data: [
+                  { type: 'max', name: 'Max' },
+                  { type: 'min', name: 'Min' }
+                ]
+              },
+                          markLine: {
+                data: [{ type: 'average', name: 'Avg' }]
+              }
+        }
+    ]
+};
+
+if (option && typeof option === 'object') {
+    myChart.setOption(option);
+}
+
+
+</script>
+<script>
+var dom = document.getElementById("app2");
+var myChart = echarts.init(dom);
+
+var option = {
+    title: {
+        text: '各价格区间占比',
+    },
+  tooltip: {
+    trigger: 'item'
+  },
+    series: [
+    {
+      name: '万',
+      type: 'pie',
+      radius: '50%',
+      data: {{fz_dict11 | safe}},
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
+    }
+  ]
+};
+
+if (option && typeof option === 'object') {
+    myChart.setOption(option);
+}
+
+
+</script>
+
+<script>
+var dom = document.getElementById("app5");
+var myChart = echarts.init(dom);
+var colors = ['#66CC99', '#FFCC66', '#FF6666', '#6699CC'];
+
+var option = {
+    title: {
+        text: '各品牌销量',
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+              type: 'shadow'
+            }
+    },
+    
+    dataZoom: [
+        {
+          show: true,
+          start: 0,
+          end: 20
+        },
+        {
+          show: true,
+          yAxisIndex: 0,
+          filterMode: 'empty',
+          width: 30,
+          height: '80%',
+          showDataShadow: false,
+          left: '93%'
+        }
+      ],
+
+      toolbox: {
+            show: true,
+            feature: {
+              dataView: { show: true, readOnly: false },
+              magicType: { show: true, type: ['line', 'bar'] },
+              restore: { show: true },
+              saveAsImage: { show: true }
+            }
+          },
+      grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+    xAxis: [
+        {
+            type: 'category',
+            data: {{fz_name4 | safe}},
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+            boundaryGap: [0, 0.01]
+        }
+    ],
+    series: [
+        {
+            name: '数',
+            data: {{fz_count4 | safe}},
+            type: 'bar',
+            itemStyle: {
+                color: function(params) {
+                    return colors[params.dataIndex % colors.length];
+                }
+            },
+
+        }
+    ]
+};
+
+if (option && typeof option === 'object') {
+    myChart.setOption(option);
+}
+
+
+</script>
+
+<script>
+var dom = document.getElementById("app6");
+var myChart = echarts.init(dom);
+
+var option = {
+    title: {
+        text: '销量和价格散点图',
+    },
+    tooltip: {
+                    /*返回需要的信息*/
+                    formatter: function(param) {
+                        var value = param.value;
+                        return '<div style="border-bottom: 1px solid rgba(255,255,255,.3); font-size: 16px;padding-bottom: 7px;margin-bottom: 7px;"> '+ '(价格:' + value[1] + ',销量:' + value[0] + ')' +
+                            '</div>';
+                    }
+                },
+    xAxis: {
+        scale: true
+    },
+    yAxis: {
+        scale: true
+    },
+    series: [ {
+          symbolSize: 10,
+          data: {{ fz_dict2 |safe }},
+          type: 'scatter'
+        }]
+};
+
+
+if (option && typeof option === 'object') {
+    myChart.setOption(option);
+}
+
+
+</script>
+
+<script>
+var dom = document.getElementById("app10");
+var myChart = echarts.init(dom);
+var colors = ['#66CC99', '#FFCC66', '#FF6666', '#6699CC'];
+
+var option = {
+    title: {
+        text: '在售统计',
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: {{fz_name10 | safe}},
+            axisTick: {
+                alignWithLabel: true
+            }
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value'
+        }
+    ],
+    series: [
+        {
+            name: '数量',
+            type: 'bar',
+            barWidth: '60%',
+            data: {{fz_count10 | safe}},
+                        itemStyle: {
+                color: function(params) {
+                    return colors[params.dataIndex % colors.length];
+                }
+            },
+        }
+    ]
+};
+
+if (option && typeof option === 'object') {
+    myChart.setOption(option);
+}
+
+
+</script>
+
+
+
+<script type="text/javascript">
+var dom3 = document.getElementById("app9");
+var myChart3 = echarts.init(dom3);
+var option3 = {
+  title: {
+		text: '品牌云图',
+	  },
+	  tooltip: {},
+	  series: [{
+		type: 'wordCloud',
+		gridSize: 2,
+		rotationRange: [0, 1000],
+		shape: 'triangle',
+		textStyle: {
+		  normal: {
+			color: function () {
+			  return 'rgb(' + [
+				Math.round(Math.random() * 160),
+				Math.round(Math.random() * 160),
+				Math.round(Math.random() * 160)
+			  ].join(',') + ')';
+			}
+		  },
+		  emphasis: {
+			shadowBlur: 10,
+			shadowColor: '#333'
+		  }
+		},
+		data: {{ gjcs | safe}},
+	  }]
+};
+
+if (option3 && typeof option3 === 'object') {
+	myChart3.setOption(option3);
+}
+
+</script>
+
+
+
+{% endblock %}

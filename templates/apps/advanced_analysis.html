@@ -1,0 +1,517 @@
+{% extends 'apps/base.html' %}
+{% load custom_filters %}
+{% block title %}SUV汽车高级数据分析{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header"><i class="fa fa-chart-bar"></i> SUV汽车高级数据分析</h3>
+            <ol class="breadcrumb">
+                <li><i class="fa fa-home"></i><a href="/index">首页</a></li>
+                <li><i class="fa fa-chart-bar"></i><a href="/analysis">聚类分析</a></li>
+                <li><i class="fa fa-chart-line"></i>高级可视化</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- 筛选控件 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-filter"></i> 数据筛选</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" class="form-inline">
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="year" class="mr-2">年份:</label>
+                                <select class="form-control" id="year" name="year">
+                                    <option value="">全部</option>
+                                    {% for year in all_years %}
+                                    <option value="{{ year }}" {% if current_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="price_min" class="mr-2">最低价格:</label>
+                                <input type="number" class="form-control" id="price_min" name="price_min" value="{{ current_price_min }}" placeholder="最低价格">
+                            </div>
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="price_max" class="mr-2">最高价格:</label>
+                                <input type="number" class="form-control" id="price_max" name="price_max" value="{{ current_price_max }}" placeholder="最高价格">
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-2">筛选</button>
+                            <a href="/advanced_analysis" class="btn btn-secondary mb-2 ml-2">重置</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 三维散点图 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-cube"></i> 三维散点图 - 价格、销量、年份分布</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="scatter3dChart" style="width: 100%; height: 600px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 雷达图和箱线图 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-spider"></i> 雷达图 - 各档次SUV多维度特征对比</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="radarChart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-box"></i> 箱线图 - 各档次SUV价格分布</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="boxplotChart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 平行坐标图 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-stream"></i> 平行坐标图 - 多维度特征分布</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="parallelChart" style="width: 100%; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 热力图 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-fire"></i> 热力图 - 品牌与价格区间分布</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="heatmapChart" style="width: 100%; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据分析说明 -->
+        <div class="row" style="background-color: white;margin: 20px 20px 20px 20px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4><i class="fa fa-info-circle"></i> 数据分析说明</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>聚类方法说明</h5>
+                                <p>本系统使用K-means聚类算法，基于价格和销量两个维度对SUV车型进行分类，并给予价格更高的权重。高档SUV通常价格更高，中档和低档SUV则根据价格和销量的综合表现进行区分。</p>
+
+                                <h5>三维散点图</h5>
+                                <p>展示了SUV汽车在价格、销量和年份三个维度上的分布情况，不同颜色代表不同档次的SUV。通过此图可以直观地看出高、中、低档SUV在这三个维度上的聚集情况。</p>
+
+                                <h5>雷达图</h5>
+                                <p>展示了各档次SUV在平均价格、平均销量、车型数量、价格区间和最高价格五个维度上的相对表现。数值越大表示在该维度上的表现越突出。</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>平行坐标图</h5>
+                                <p>通过平行坐标的方式，展示了每款SUV在价格、销量、年份、最低价格、最高价格等多个维度上的表现。每条线代表一款车型，不同颜色代表不同档次。</p>
+
+                                <h5>箱线图</h5>
+                                <p>展示了各档次SUV价格分布的中位数、四分位数和异常值。通过箱线图可以清晰地看出各档次SUV价格分布的集中趋势和离散程度。</p>
+
+                                <h5>热力图</h5>
+                                <p>展示了不同品牌在不同价格区间的车型分布密度。颜色越深表示在该价格区间的车型数量越多。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
+<script type="text/javascript">
+    // 获取后端传递的数据
+    var scatter3dData = {{ scatter3d_data|safe }};
+    var radarIndicators = {{ radar_indicators|safe }};
+    var radarData = {{ radar_data|safe }};
+    var parallelData = {{ parallel_data|safe }};
+    var boxplotData = {{ boxplot_data|safe }};
+    var heatmapData = {{ heatmap_data|safe }};
+    var heatmapXLabels = {{ heatmap_x_labels|safe }};
+    var heatmapYLabels = {{ heatmap_y_labels|safe }};
+    var clusterNames = {{ cluster_names|safe }};
+
+    // 颜色配置
+    var colors = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272'];
+
+    // 初始化图表
+    var scatter3dChart = echarts.init(document.getElementById('scatter3dChart'));
+    var radarChart = echarts.init(document.getElementById('radarChart'));
+    var boxplotChart = echarts.init(document.getElementById('boxplotChart'));
+    var parallelChart = echarts.init(document.getElementById('parallelChart'));
+    var heatmapChart = echarts.init(document.getElementById('heatmapChart'));
+
+    // 设置中文字体
+    var fontStyle = {
+        fontFamily: 'Microsoft YaHei',
+        fontSize: 12
+    };
+
+    // 1. 三维散点图配置
+    var scatter3dOption = {
+        grid3D: {
+            viewControl: {
+                // 允许用户旋转和缩放
+                autoRotate: true,
+                autoRotateSpeed: 5,
+                distance: 200
+            }
+        },
+        xAxis3D: {
+            name: '价格（万元）',
+            nameTextStyle: fontStyle,
+            type: 'value'
+        },
+        yAxis3D: {
+            name: '销量（辆）',
+            nameTextStyle: fontStyle,
+            type: 'value'
+        },
+        zAxis3D: {
+            name: '年份',
+            nameTextStyle: fontStyle,
+            type: 'value'
+        },
+        tooltip: {
+            formatter: function(params) {
+                return params.seriesName + '<br/>' +
+                    '车型: ' + params.data[3] + '<br/>' +
+                    '价格: ' + params.data[0] + '万元<br/>' +
+                    '销量: ' + params.data[1] + '辆<br/>' +
+                    '年份: ' + params.data[2];
+            }
+        },
+        legend: {
+            data: Object.values(clusterNames),
+            textStyle: fontStyle
+        },
+        series: scatter3dData.map(function(item, index) {
+            return {
+                name: item.name,
+                type: 'scatter3D',
+                data: item.data,
+                symbolSize: 8,
+                itemStyle: {
+                    color: colors[index]
+                },
+                emphasis: {
+                    itemStyle: {
+                        color: colors[index],
+                        opacity: 0.8,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }
+                }
+            };
+        })
+    };
+
+    // 2. 雷达图配置
+    var radarOption = {
+        color: colors,
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            data: radarData.map(function(item) { return item.name; }),
+            textStyle: fontStyle
+        },
+        radar: {
+            indicator: radarIndicators.map(function(item) {
+                return {
+                    name: item.name,
+                    max: item.max
+                };
+            }),
+            name: {
+                textStyle: fontStyle
+            }
+        },
+        series: [{
+            type: 'radar',
+            data: radarData.map(function(item, index) {
+                return {
+                    name: item.name,
+                    value: item.value,
+                    areaStyle: {
+                        color: {
+                            type: 'radial',
+                            x: 0.5,
+                            y: 0.5,
+                            r: 0.5,
+                            colorStops: [{
+                                offset: 0,
+                                color: colors[index] + '80' // 半透明
+                            }, {
+                                offset: 1,
+                                color: colors[index] + '20' // 更透明
+                            }]
+                        }
+                    },
+                    lineStyle: {
+                        width: 2
+                    }
+                };
+            })
+        }]
+    };
+
+    // 3. 箱线图配置
+    var boxplotOption = {
+        title: {
+            text: '各档次SUV价格分布',
+            textStyle: fontStyle
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                return params.name + '<br/>' +
+                    '最大值: ' + params.data[5].toFixed(2) + '万元<br/>' +
+                    '上四分位: ' + params.data[4].toFixed(2) + '万元<br/>' +
+                    '中位数: ' + params.data[3].toFixed(2) + '万元<br/>' +
+                    '下四分位: ' + params.data[2].toFixed(2) + '万元<br/>' +
+                    '最小值: ' + params.data[1].toFixed(2) + '万元';
+            }
+        },
+        grid: {
+            left: '10%',
+            right: '10%',
+            bottom: '15%'
+        },
+        xAxis: {
+            type: 'category',
+            data: boxplotData.map(function(item) { return item.name; }),
+            axisLabel: fontStyle,
+            boundaryGap: true,
+            nameGap: 30,
+            splitArea: {
+                show: false
+            },
+            axisLabel: {
+                formatter: '{value}',
+                textStyle: fontStyle
+            },
+            splitLine: {
+                show: false
+            }
+        },
+        yAxis: {
+            type: 'value',
+            name: '价格（万元）',
+            nameTextStyle: fontStyle,
+            axisLabel: {
+                formatter: '{value}',
+                textStyle: fontStyle
+            },
+            splitArea: {
+                show: true
+            }
+        },
+        series: [
+            {
+                name: '箱线图',
+                type: 'boxplot',
+                datasetIndex: 0,
+                data: boxplotData.map(function(item, index) {
+                    // 计算箱线图数据
+                    var data = item.data.sort(function(a, b) { return a - b; });
+                    var q1 = quantile(data, 0.25);
+                    var q2 = quantile(data, 0.5);
+                    var q3 = quantile(data, 0.75);
+                    var min = Math.max(data[0], q1 - 1.5 * (q3 - q1));
+                    var max = Math.min(data[data.length - 1], q3 + 1.5 * (q3 - q1));
+                    return [min, q1, q2, q3, max];
+                }),
+                itemStyle: {
+                    color: function(params) {
+                        return colors[params.dataIndex];
+                    },
+                    borderColor: function(params) {
+                        return colors[params.dataIndex];
+                    }
+                }
+            }
+        ]
+    };
+
+    // 辅助函数：计算分位数
+    function quantile(data, p) {
+        var idx = Math.floor(data.length * p);
+        if (data.length % 2 === 0) {
+            return (data[idx - 1] + data[idx]) / 2;
+        } else {
+            return data[idx];
+        }
+    }
+
+    // 4. 平行坐标图配置
+    var parallelOption = {
+        parallelAxis: [
+            {dim: 0, name: '价格（万元）', nameTextStyle: fontStyle},
+            {dim: 1, name: '销量（辆）', nameTextStyle: fontStyle},
+            {dim: 2, name: '年份', nameTextStyle: fontStyle},
+            {dim: 3, name: '最低价格（万元）', nameTextStyle: fontStyle},
+            {dim: 4, name: '最高价格（万元）', nameTextStyle: fontStyle},
+            {
+                dim: 5,
+                name: '档次',
+                nameTextStyle: fontStyle,
+                type: 'category',
+                data: Object.values(clusterNames)
+            }
+        ],
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                return '车型: ' + params.data[6] + '<br/>' +
+                    '价格: ' + params.data[0] + '万元<br/>' +
+                    '销量: ' + params.data[1] + '辆<br/>' +
+                    '年份: ' + params.data[2] + '<br/>' +
+                    '最低价格: ' + params.data[3] + '万元<br/>' +
+                    '最高价格: ' + params.data[4] + '万元<br/>' +
+                    '档次: ' + clusterNames[params.data[5]];
+            }
+        },
+        parallel: {
+            parallelAxisDefault: {
+                nameLocation: 'end',
+                nameGap: 20
+            }
+        },
+        visualMap: {
+            show: true,
+            min: 0,
+            max: 2,
+            dimension: 5,
+            inRange: {
+                color: colors.slice(0, 3)
+            },
+            textStyle: fontStyle
+        },
+        series: [
+            {
+                name: 'SUV汽车多维度特征',
+                type: 'parallel',
+                lineStyle: {
+                    width: 2,
+                    opacity: 0.5
+                },
+                data: parallelData
+            }
+        ]
+    };
+
+    // 5. 热力图配置
+    var heatmapOption = {
+        tooltip: {
+            position: 'top',
+            formatter: function(params) {
+                return '品牌: ' + params.name + '<br/>' +
+                    '价格区间: ' + heatmapXLabels[params.data[0]] + '<br/>' +
+                    '车型数量: ' + params.data[2];
+            }
+        },
+        grid: {
+            height: '70%',
+            top: '10%'
+        },
+        xAxis: {
+            type: 'category',
+            data: heatmapXLabels,
+            splitArea: {
+                show: true
+            },
+            axisLabel: fontStyle
+        },
+        yAxis: {
+            type: 'category',
+            data: heatmapYLabels,
+            splitArea: {
+                show: true
+            },
+            axisLabel: fontStyle
+        },
+        visualMap: {
+            min: 0,
+            max: Math.max.apply(null, heatmapData.flat()),
+            calculable: true,
+            orient: 'horizontal',
+            left: 'center',
+            bottom: '5%',
+            textStyle: fontStyle
+        },
+        series: [{
+            name: '品牌与价格区间分布',
+            type: 'heatmap',
+            data: heatmapData.map(function(row, i) {
+                return row.map(function(value, j) {
+                    return [j, i, value];
+                });
+            }).flat(),
+            label: {
+                show: true
+            },
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }]
+    };
+
+    // 设置图表选项
+    scatter3dChart.setOption(scatter3dOption);
+    radarChart.setOption(radarOption);
+    boxplotChart.setOption(boxplotOption);
+    parallelChart.setOption(parallelOption);
+    heatmapChart.setOption(heatmapOption);
+
+    // 响应式调整
+    window.addEventListener('resize', function() {
+        scatter3dChart.resize();
+        radarChart.resize();
+        boxplotChart.resize();
+        parallelChart.resize();
+        heatmapChart.resize();
+    });
+</script>
+{% endblock %}

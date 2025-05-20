@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<div style="height:650px;width: 500px" id="main12"></div>
+
+
+</body>
+
+
+    <script src="/static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+    <script src="/static/js/echarts.js" charset='utf-8'></script>
+    <script src="/static/js/echarts-wordcloud.min.js" type="text/javascript" charset='utf-8'></script>
+
+    <script type="text/javascript">
+                        function echartsCloud() {
+                        // 基于准备好的dom，初始化echarts实例
+                        var myChart = echarts.init(document.getElementById('main12'));
+
+
+                        myChart.setOption({
+                            title: {
+                                left: 'center',
+                                text: '小区名称关键词词云',
+                            },
+                            tooltip: {},
+                            series: [{
+                                type: 'wordCloud',  //类型为字符云
+                                shape: 'circle',  //平滑 椭圆:ellipse 圆形:circle
+                                gridSize: 20,    //网格尺寸
+                                size: ['100%', '100%'],
+                                sizeRange: [10, 100],
+                                rotationRange: [0, 40], //旋转范围
+                                textStyle: {
+                                    normal: {
+                                        fontFamily: 'sans-serif',
+                                        color: function () {
+                                            return 'rgb('
+                                                + [Math.round(Math.random() * 160),
+                                                    Math.round(Math.random() * 160),
+                                                    Math.round(Math.random() * 160)
+                                                ].join(',') + ')';
+                                        }
+                                    },
+                                    emphasis: {
+                                        shadowBlur: 5,       //阴影距离
+                                        shadowColor: '#333'  //阴影颜色
+                                    }
+                                },
+                                data: [
+    {
+        "name": "花园",
+        "value": 116
+    },
+    {
+        "name": "万科",
+        "value": 87
+    },
+    {
+        "name": "富力",
+        "value": 58
+    },
+    {
+        "name": "广州",
+        "value": 58
+    },
+    {
+        "name": "珠江",
+        "value": 36
+    },
+    {
+        "name": "帝景苑",
+        "value": 36
+    },
+    {
+        "name": "保利",
+        "value": 29
+    },
+    {
+        "name": "罗兰",
+        "value": 29
+    },
+    {
+        "name": "国际",
+        "value": 29
+    },
+    {
+        "name": "欧泊",
+        "value": 29
+    },
+    {
+        "name": "骏景",
+        "value": 29
+    },
+    {
+        "name": "东荟城",
+        "value": 29
+    },
+    {
+        "name": "雅居乐",
+        "value": 29
+    },
+    {
+        "name": "富春山",
+        "value": 29
+    },
+    {
+        "name": "岭南",
+        "value": 29
+    },
+    {
+        "name": "新世界",
+        "value": 29
+    },
+    {
+        "name": "恒大",
+        "value": 29
+    },
+    {
+        "name": "绿洲",
+        "value": 29
+    },
+    {
+        "name": "山景",
+        "value": 29
+    },
+    {
+        "name": "科城",
+        "value": 29
+    },
+    {
+        "name": "山庄",
+        "value": 29
+    },
+    {
+        "name": "桃园",
+        "value": 29
+    },
+    {
+        "name": "华远",
+        "value": 29
+    },
+    {
+        "name": "云和墅",
+        "value": 29
+    },
+    {
+        "name": "光大",
+        "value": 29
+    },
+    {
+        "name": "第三",
+        "value": 29
+    },
+    {
+        "name": "金碧",
+        "value": 29
+    },
+    {
+        "name": "白天鹅",
+        "value": 29
+    },
+    {
+        "name": "景翠园",
+        "value": 29
+    },
+    {
+        "name": "珠光",
+        "value": 4
+    },
+    {
+        "name": "御景",
+        "value": 4
+    },
+    {
+        "name": "壹号",
+        "value": 4
+    }
+],
+                            }]
+                        });
+
+
+
+
+
+                    }
+                    echartsCloud();  //初始化echarts图
+                                           $(window).resize(function () {
+                      myChart.resize();
+
+                        });
+
+    </script>
+</html>
