@@ -1,0 +1,39 @@
+# Compiled files
+*.o
+*.obj
+*.exe
+*.out
+*.dll
+*.so
+*.dylib
+
+# Debug logs
+DebugLog*.txt
+*Log*.txt
+crash_log.txt
+
+# Visual Studio/VS Code files
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
